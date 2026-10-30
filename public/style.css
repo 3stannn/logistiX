@@ -137,7 +137,7 @@ ul {
 
 li {
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 400;
     color: #737373;
 }
 
@@ -179,7 +179,6 @@ li:hover {
 
 .refresh-button:hover,
 .refresh-button:focus-visible {
-    background-color: #DDDDDD;
     color: #0A0A0A;
 }
 
@@ -232,6 +231,31 @@ li:hover {
 .card-value-bottom {
     color: #737373;
     font-size: 14px;
+}
+
+.inventory-card-container {
+    margin-top: 16px;
+}
+
+.inventory-card-container .card {
+    height: 80dvh;
+}
+
+button {
+    border: 1px solid #DDDDDD;
+    padding: 4px 8px;
+    display: flex;
+    gap: 8px;
+    justify-items: center;
+    align-items: center;
+    border-radius: 8px;
+    background-color: transparent;
+    color: #737373;
+}
+
+.delete-button {
+    border: 1px solid #ED372D;
+    color: #ED372D;
 }
 
 @media (max-width: 900px) {
