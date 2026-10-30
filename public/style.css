@@ -238,7 +238,76 @@ li:hover {
 }
 
 .inventory-card-container .card {
+    padding: 0;
+    overflow-x: auto;
     height: 80dvh;
+}
+
+.inventory-card-container table {
+    width: 100%;
+    min-width: 1040px;
+    table-layout: fixed;
+    border-collapse: collapse;
+    font-size: 14px;
+    text-align: left;
+}
+
+.inventory-card-container th,
+.inventory-card-container td {
+    padding: 16px 20px;
+    vertical-align: middle;
+    border-bottom: 1px solid #EEEEEE;
+}
+
+.inventory-card-container th {
+    background-color: #FAFAFA;
+    color: #737373;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.inventory-card-container th:nth-child(1) {
+    width: 72px;
+}
+
+.inventory-card-container th:nth-child(2) {
+    width: 18%;
+}
+
+.inventory-card-container th:nth-child(4),
+.inventory-card-container th:nth-child(6) {
+    width: 104px;
+}
+
+.inventory-card-container th:nth-child(5) {
+    width: 14%;
+}
+
+.inventory-card-container th:last-child {
+    width: 224px;
+}
+
+.inventory-card-container td {
+    overflow-wrap: anywhere;
+}
+
+.inventory-card-container tr:last-child td {
+    border-bottom: none;
+}
+
+.inventory-card-container td:last-child {
+    display: table-cell !important;
+    white-space: nowrap;
+}
+
+.inventory-card-container td button {
+    display: inline-flex;
+    min-height: 34px;
+    cursor: pointer;
+}
+
+.inventory-card-container td button + button {
+    margin-left: 8px;
 }
 
 button {
