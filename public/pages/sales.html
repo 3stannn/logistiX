@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>logistiX</title>
+    <link rel="shortcut icon" href="../assets/favicon.svg" type="image/x-icon" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Geist+Pixel&family=Geist:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@6.0.0-alpha.1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-B/GM4XqrwHnWXNOWMbloTmrYXZg10cakYGmpfsR/bbzQ6JAJI4ihuyADKLnBgrCe" crossorigin="anonymous" />
+    <link rel="stylesheet" href="../style.css" />
+</head>
+
+<body>
+    <aside class="vertical-nav">
+        <div class="brand-logo d-flex flex-row gap-2 align-items-center">
+            <img src="../assets/icon.png" alt="logistiX" />
+            <span class="brand">logistiX</span>
+            <button class="menu-toggle" id="menu-toggle" type="button" aria-label="Open navigation"
+                aria-expanded="false" aria-controls="sidebar-navigation">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                    stroke="#737373" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    class="lucide lucide-menu preview-icon" aria-hidden="true">
+                    <path d="M4 5h16" />
+                    <path d="M4 12h16" />
+                    <path d="M4 19h16" />
+                </svg>
+            </button>
+        </div>
+        <div class="aside-nav" id="sidebar-navigation">
+            <ul>
+                <li><button class="notification-trigger" id="notification-trigger" type="button"
+                        popovertarget="notifications-popover" aria-haspopup="dialog" aria-expanded="false"
+                        aria-controls="notifications-popover">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                            stroke="#737373" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+                            class="lucide lucide-bell preview-icon">
+                            <path d="M10.268 21a2 2 0 0 0 3.464 0" />
+                            <path
+                                d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326" />
+                        </svg>
+                        Notification</button></li>
+                <li><a href="inventory.html">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                            stroke="#737373" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+                            class="lucide lucide-package preview-icon">
+                            <path
+                                d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z" />
+                            <path d="M12 22V12" />
+                            <polyline points="3.29 7 12 12 20.71 7" />
+                            <path d="m7.5 4.27 9 5.15" />
+                        </svg>
+                        Inventory</a>
+                </li>
+                <li><a href="categories.html">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                            stroke="#737373" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+                            class="lucide lucide-list-sort-descending preview-icon">
+                            <path d="M15 12H3" />
+                            <path d="M3 5h18" />
+                            <path d="M9 19H3" />
+                        </svg>
+                        Categories</a></li>
+                <li class="settings-nav-item"><a href="#">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                            stroke="#737373" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+                            class="lucide lucide-settings preview-icon">
+                            <path
+                                d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915" />
+                            <circle cx="12" cy="12" r="3" />
+                        </svg>
+                        Settings</a></li>
+            </ul>
+        </div>
+    </aside>
+    <nav class="top-nav" aria-label="Main navigation">
+        <div>
+            <ul class="d-flex flex-row gap-10">
+                <li><a href="../index.html">Overview</a></li>
+                <li><a href="sales.html" aria-current="page">Sales</a></li>
+            </ul>
+        </div>
+    </nav>
+    <main>
+        <div class="page-heading">
+            <h1 class="heading">Sales</h1>
+        </div>
+        <div class="table-section">
+            <div class="card table-card sales-table-card" tabindex="0" role="region" aria-label="Sales table">
+                <table class="data-table sales-table" aria-label="Sales">
+                    <thead>
+                        <tr>
+                            <th scope="col">Product Name</th>
+                            <th scope="col">Quantity</th>
+                            <th scope="col">Category</th>
+                            <th scope="col">Price</th>
+                            <th scope="col">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="table-empty" colspan="5">No sales to display.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+    <script src="../script.js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/bootstrap@6.0.0-alpha.1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-1a/pXj49ZQ1aHEmrJ+gMw1otqoVsYwlEnlD8mIfY2TV03r20Y0CN7uqx1tQogjPL"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>
