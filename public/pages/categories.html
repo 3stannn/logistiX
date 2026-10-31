@@ -101,6 +101,7 @@
                         <tr>
                             <th scope="col">Category</th>
                             <th scope="col">Description</th>
+                            <th scope="col">Number of Items</th>
                             <th scope="col">Actions</th>
                         </tr>
                     </thead>
@@ -168,10 +169,10 @@
             <input id="category-name" name="name" type="text" placeholder="Enter category name" required autofocus>
             <label for="category-description">Description</label>
             <textarea id="category-description" name="description" rows="3" placeholder="Enter category description"></textarea>
-            <p class="modal-note" id="create-category-note">Saving categories is not connected yet.</p>
+            <p class="modal-note" id="create-category-note"></p>
             <div class="modal-actions">
                 <button type="button" data-modal-close>Cancel</button>
-                <button type="submit" disabled aria-describedby="create-category-note">Create category</button>
+                <button type="submit" >Create category</button>
             </div>
         </form>
     </dialog>
@@ -183,14 +184,15 @@
             </button>
         </div>
         <form class="modal-form">
+            <input type="hidden" id="edit-category-id" name="id">
             <label for="edit-category-name">Category name</label>
-            <input id="edit-category-name" name="name" type="text" value="test" required autofocus>
+            <input id="edit-category-name" name="name" type="text" placeholder="Enter category name" required autofocus>
             <label for="edit-category-description">Description</label>
-            <textarea id="edit-category-description" name="description" rows="3">test</textarea>
-            <p class="modal-note" id="edit-category-note">Saving changes is not connected yet.</p>
+            <textarea id="edit-category-description" name="description" rows="3" placeholder="Enter description"></textarea>
+            <p class="modal-note" id="edit-category-note"></p>
             <div class="modal-actions">
                 <button type="button" data-modal-close>Cancel</button>
-                <button type="submit" disabled aria-describedby="edit-category-note">Save changes</button>
+                <button type="submit" >Save changes</button>
             </div>
         </form>
     </dialog>
@@ -202,11 +204,12 @@
             </button>
         </div>
         <form class="modal-form">
-            <p>Delete category <strong>test</strong>? This cannot be undone.</p>
-            <p class="modal-note" id="delete-category-note">Deleting categories is not connected yet.</p>
+            <input type="hidden" id="delete-category-id" name="id">
+            <p>Delete category <strong id="delete-category-name">category</strong>? This cannot be undone.</p>
+            <p class="modal-note" id="delete-category-note"></p>
             <div class="modal-actions">
                 <button type="button" data-modal-close autofocus>Cancel</button>
-                <button class="delete-button" type="submit" disabled aria-describedby="delete-category-note">Delete category</button>
+                <button class="delete-button" type="submit" >Delete category</button>
             </div>
         </form>
     </dialog>

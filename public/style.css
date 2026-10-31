@@ -841,6 +841,15 @@ html.modal-open {
     width: 192px;
 }
 
+.categories-table :is(th, td):nth-child(3) {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    padding-right: 36px;
+    width: 170px;
+}
+    width: 192px;
+}
+
 .data-table .table-empty {
     padding: 32px 18px;
     color: var(--muted);
@@ -1077,4 +1086,99 @@ html.modal-open {
     .refresh-button:hover svg {
         transform: none;
     }
+}
+
+
+.notification-trigger.has-alerts::after {
+    content: '';
+    width: 7px;
+    height: 7px;
+    background-color: var(--danger, #ED372D);
+    border-radius: 50%;
+    margin-left: auto;
+}
+
+.inventory-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.search-input-wrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
+.search-input-wrapper .search-icon {
+    position: absolute;
+    left: 12px;
+    color: var(--muted);
+    pointer-events: none;
+}
+
+.search-input-wrapper input {
+    min-height: 36px;
+    width: 240px;
+    padding: 6px 12px 6px 36px;
+    border-radius: 6px;
+    border: 1px solid var(--control-border);
+    background-color: var(--surface);
+    color: var(--ink);
+    font: inherit;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.search-input-wrapper input:hover {
+    border-color: var(--control-hover-border);
+}
+
+.search-input-wrapper input:focus-visible {
+    border-color: var(--ink);
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+}
+
+.filter-select-wrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
+.filter-select-wrapper .filter-icon {
+    position: absolute;
+    left: 10px;
+    color: var(--muted);
+    pointer-events: none;
+}
+
+.filter-select-wrapper select {
+    min-height: 36px;
+    padding: 6px 32px 6px 30px;
+    border-radius: 6px;
+    border: 1px solid var(--control-border);
+    background-color: var(--surface);
+    color: var(--ink);
+    font: inherit;
+    font-size: 13px;
+    cursor: pointer;
+    outline: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23737373' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    transition: border-color 150ms ease;
+}
+
+.filter-select-wrapper select:hover {
+    border-color: var(--control-hover-border);
+}
+
+.filter-select-wrapper select:focus-visible {
+    border-color: var(--ink);
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
 }
