@@ -11,18 +11,60 @@
     --ink: #20232B;
     --muted: #626874;
     --accent: #DCFF00;
+    --canvas: #E9EDF2;
+    --shell-border: #D8DDE4;
+    --control-border: #DDE0E6;
+    --control-hover-border: #C8CDD6;
+    --strong: #171A21;
+    --nav-text: #505661;
+    --hover: #EDEFF3;
+    --value: #333842;
+    --scrollbar: #CDD2DB;
+    --row-hover: #FAFBFC;
+    --danger: #B83B40;
+    --danger-border: #E4C2C5;
+    --danger-hover: #FFF5F5;
+    --switch-track: #D2D6DD;
+    --switch-thumb: #FFFFFF;
+    --popover-shadow: 0 8px 28px rgba(32, 35, 43, 0.12);
+    color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+    --surface: #1D1F22;
+    --sidebar: #191B1E;
+    --border: #33363C;
+    --ink: #E7E9ED;
+    --muted: #ABB1BC;
+    --canvas: #121416;
+    --shell-border: #34373D;
+    --control-border: #454A54;
+    --control-hover-border: #656D7A;
+    --strong: #F4F5F7;
+    --nav-text: #C0C5CE;
+    --hover: #2B2E34;
+    --value: #E4E7EC;
+    --scrollbar: #555C67;
+    --row-hover: #25282D;
+    --danger: #FF989D;
+    --danger-border: #88494E;
+    --danger-hover: #39252A;
+    --switch-track: #4E5561;
+    --switch-thumb: #E7E9ED;
+    --popover-shadow: 0 8px 28px rgba(0, 0, 0, 0.32);
+    color-scheme: dark;
 }
 
 html {
     min-height: 100%;
-    background: #E9EDF2;
+    background: var(--canvas);
 }
 
 body {
     position: relative;
     min-height: calc(100dvh - 32px);
     margin: 16px;
-    border: 1px solid #D8DDE4;
+    border: 1px solid var(--shell-border);
     border-radius: 14px;
     background: var(--surface);
     color: var(--ink);
@@ -55,7 +97,7 @@ button {
     gap: 6px;
     min-height: 32px;
     padding: 6px 10px;
-    border: 1px solid #DDE0E6;
+    border: 1px solid var(--control-border);
     border-radius: 6px;
     background: var(--surface);
     color: var(--ink);
@@ -66,8 +108,8 @@ button {
 }
 
 button:hover {
-    border-color: #C8CDD6;
-    background: #F6F7F9;
+    border-color: var(--control-hover-border);
+    background: var(--sidebar);
 }
 
 :where(a, button, [tabindex]):focus-visible {
@@ -129,7 +171,7 @@ svg {
 }
 
 .brand {
-    color: #171A21;
+    color: var(--strong);
     font-size: 15px;
     font-weight: 650;
     letter-spacing: -0.4px;
@@ -153,19 +195,19 @@ svg {
 }
 
 .aside-nav a,
-.aside-nav .notification-trigger {
+.aside-nav :is(.notification-trigger, .settings-trigger) {
     display: flex;
     align-items: center;
     gap: 10px;
     min-height: 38px;
     padding: 9px 12px;
     border-radius: 6px;
-    color: #505661;
+    color: var(--nav-text);
     font-size: 13px;
     transition: background-color 150ms ease, color 150ms ease;
 }
 
-.aside-nav .notification-trigger {
+.aside-nav :is(.notification-trigger, .settings-trigger) {
     width: 100%;
     justify-content: flex-start;
     border: 0;
@@ -182,13 +224,13 @@ svg {
 }
 
 .aside-nav a:hover,
-.aside-nav .notification-trigger:hover,
-.aside-nav .notification-trigger[aria-expanded="true"] {
+.aside-nav :is(.notification-trigger, .settings-trigger):hover,
+.aside-nav :is(.notification-trigger, .settings-trigger)[aria-expanded="true"] {
     color: var(--ink);
-    background: #EDEFF3;
+    background: var(--hover);
 }
 
-.notifications-popover {
+.nav-popover {
     position: fixed;
     inset: auto;
     width: min(336px, calc(100vw - 24px));
@@ -199,11 +241,11 @@ svg {
     border-radius: 8px;
     background: var(--surface);
     color: var(--ink);
-    box-shadow: 0 8px 28px rgba(32, 35, 43, 0.12);
+    box-shadow: var(--popover-shadow);
     overflow-y: auto;
 }
 
-.notifications-header {
+.popover-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -212,18 +254,77 @@ svg {
     border-bottom: 1px solid var(--border);
 }
 
-.notifications-header h2 {
+.popover-header h2 {
     font-size: 14px;
     font-weight: 600;
     line-height: 1.5;
 }
 
-.notifications-close {
+.popover-close {
     width: 32px;
     height: 32px;
     padding: 0;
     border-color: transparent;
     color: var(--muted);
+}
+
+
+.theme-setting {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    min-height: 76px;
+    margin: 0;
+    padding: 20px;
+    color: var(--ink);
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.theme-toggle {
+    appearance: none;
+    position: relative;
+    flex-shrink: 0;
+    width: 36px;
+    height: 22px;
+    margin: 0;
+    border: 1px solid var(--control-border);
+    border-radius: 12px;
+    background: var(--switch-track);
+    cursor: pointer;
+    transition: background-color 150ms ease;
+}
+
+.theme-toggle::before {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--switch-thumb);
+    content: '';
+    transition: transform 150ms ease;
+}
+
+.theme-toggle:checked {
+    border-color: var(--accent);
+    background: var(--accent);
+}
+
+.theme-toggle:checked::before {
+    background: #20232B;
+    transform: translateX(14px);
+}
+
+.theme-toggle:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 3px;
+}
+
+.menu-toggle svg {
+    stroke: currentColor;
 }
 
 .notifications-empty {
@@ -329,7 +430,7 @@ main {
 }
 
 .heading {
-    color: #171A21;
+    color: var(--strong);
     font-size: 20px;
     font-weight: 600;
     line-height: 1.3;
@@ -338,7 +439,7 @@ main {
 
 .refresh-button {
     flex-shrink: 0;
-    color: #505661;
+    color: var(--nav-text);
     font-size: 12px;
 }
 
@@ -402,7 +503,7 @@ main {
 
 .card-value {
     margin: 18px 0 0;
-    color: #333842;
+    color: var(--value);
     font-size: 28px;
     font-weight: 500;
     line-height: 1.2;
@@ -438,7 +539,7 @@ main {
     padding: 0;
     overflow-x: auto;
     scrollbar-width: thin;
-    scrollbar-color: #CDD2DB transparent;
+    scrollbar-color: var(--scrollbar) transparent;
 }
 
 .data-table {
@@ -479,7 +580,7 @@ main {
 }
 
 .data-table tbody tr:hover td {
-    background: #FAFBFC;
+    background: var(--row-hover);
 }
 
 .recent-activity-table th:nth-child(1) {
@@ -599,12 +700,12 @@ main {
 }
 
 .delete-button {
-    color: #B83B40;
+    color: var(--danger);
 }
 
 .delete-button:hover {
-    border-color: #E4C2C5;
-    background: #FFF5F5;
+    border-color: var(--danger-border);
+    background: var(--danger-hover);
 }
 
 @media (max-width: 1100px) and (min-width: 901px) {
@@ -674,7 +775,7 @@ main {
     }
 
     .aside-nav a,
-    .aside-nav .notification-trigger {
+    .aside-nav :is(.notification-trigger, .settings-trigger) {
         min-height: 44px;
     }
 
@@ -790,7 +891,7 @@ main {
         min-height: 44px;
     }
 
-    .notifications-close {
+    .popover-close {
         width: 44px;
         height: 44px;
     }
