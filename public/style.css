@@ -62,7 +62,8 @@ html {
 
 body {
     position: relative;
-    min-height: calc(100dvh - 32px);
+    height: calc(100dvh - 32px);
+    max-height: calc(100dvh - 32px);
     margin: 16px;
     border: 1px solid var(--shell-border);
     border-radius: 14px;
@@ -71,6 +72,10 @@ body {
     font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     font-size: 13px;
     line-height: 1.5;
+    display: grid;
+    grid-template-columns: var(--sidebar-width) 1fr;
+    grid-template-rows: auto 1fr;
+    overflow: hidden;
 }
 
 h1,
@@ -144,10 +149,9 @@ svg {
 }
 
 .vertical-nav {
-    position: fixed;
-    top: 17px;
-    bottom: 17px;
-    left: 17px;
+    grid-column: 1;
+    grid-row: 1 / -1;
+    height: 100%;
     z-index: 10;
     display: flex;
     flex-direction: column;
@@ -366,10 +370,12 @@ svg {
 }
 
 .top-nav {
+    grid-column: 2;
+    grid-row: 1;
     display: flex;
     align-items: stretch;
     min-height: var(--header-height);
-    margin-left: var(--sidebar-width);
+    margin-left: 0;
     padding: 0 28px;
     border-bottom: 1px solid var(--border);
 }
@@ -416,9 +422,14 @@ svg {
 }
 
 main {
+    grid-column: 2;
+    grid-row: 2;
     min-width: 0;
-    margin-left: var(--sidebar-width);
+    margin-left: 0;
     padding: 28px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar) transparent;
 }
 
 .page-heading {
@@ -918,15 +929,20 @@ html.modal-open {
     }
 
     body {
+        display: block;
+        height: auto;
+        max-height: none;
         min-height: 100dvh;
         margin: 0;
         border: 0;
         border-radius: 0;
+        overflow: visible;
     }
 
     .vertical-nav {
         position: static;
         width: 100%;
+        height: auto;
         border: 0;
         border-bottom: 1px solid var(--border);
         border-radius: 0;
@@ -1181,4 +1197,107 @@ html.modal-open {
     border-color: var(--ink);
     outline: 2px solid var(--accent);
     outline-offset: 1px;
+}
+
+/* Modal Combobox (Dropdown that can be typed into) */
+.modal-combo {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.modal-combo input {
+    width: 100%;
+    padding-right: 36px !important;
+}
+
+.modal-combo .combo-chevron {
+    position: absolute;
+    right: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: color 150ms ease, background-color 150ms ease;
+}
+
+.modal-combo .combo-chevron:hover {
+    color: var(--ink);
+    background: var(--hover);
+}
+
+.modal-combo .combo-menu {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    max-height: 180px;
+    overflow-y: auto;
+    background: var(--surface);
+    border: 1px solid var(--control-border);
+    border-radius: 6px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    z-index: 100;
+    padding: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.modal-combo .combo-menu[hidden] {
+    display: none !important;
+}
+
+.modal-combo .combo-option {
+    display: block;
+    width: 100%;
+    padding: 6px 10px;
+    text-align: left;
+    font-size: 13px;
+    font-family: inherit;
+    border: none;
+    background: transparent;
+    color: var(--ink);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 120ms ease, color 120ms ease;
+}
+
+.modal-combo .combo-option:hover,
+.modal-combo .combo-option:focus-visible {
+    background: var(--hover);
+    outline: none;
+}
+
+.modal-combo .combo-option.selected {
+    background: var(--sidebar);
+    font-weight: 600;
+    color: var(--accent);
+}
+
+:root[data-theme="light"] .modal-combo .combo-option.selected {
+    color: #171A21;
+    background: #EAEAEA;
+}
+
+.sale-calc-breakdown {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 2px;
+    line-height: 1.4;
+    transition: color 150ms ease;
+}
+
+.sale-calc-breakdown strong {
+    color: var(--ink);
 }

@@ -63,6 +63,9 @@ darkModeToggle.addEventListener('change', () => {
     } catch {
         // The toggle still works for this page when browser storage is unavailable.
     }
+    if (salesChartInstance && typeof updateSalesChartForSelectedMonth === 'function') {
+        updateSalesChartForSelectedMonth();
+    }
 });
 
 const navPopovers = [
@@ -227,6 +230,63 @@ async function handleModalOpen(modalId, trigger) {
         const priceInput = document.getElementById('sale-price');
         const catInput = document.getElementById('sale-category');
         const qtyInput = document.getElementById('sale-quantity');
+        const markupInput = document.getElementById('sale-markup');
+        const calcNote = document.getElementById('sale-calc-note');
+        const combo = document.getElementById('sale-markup-combo');
+
+        let selectedBasePrice = 0;
+
+        function getMarkupPercent() {
+            if (!markupInput) return 5;
+            const raw = markupInput.value.replace('%', '').trim();
+            const val = parseFloat(raw);
+            return isNaN(val) ? 5 : val;
+        }
+
+        function updateCalc(source) {
+            if (!selectedBasePrice) {
+                if (priceInput) priceInput.value = '0.00';
+                if (calcNote) calcNote.innerHTML = '';
+                return;
+            }
+
+            let markup = getMarkupPercent();
+
+            if (source === 'price' && priceInput) {
+                const enteredPrice = parseFloat(priceInput.value) || 0;
+                if (selectedBasePrice > 0) {
+                    const derived = ((enteredPrice - selectedBasePrice) / selectedBasePrice) * 100;
+                    markup = Math.round(derived * 100) / 100;
+                    if (markupInput) markupInput.value = `${markup}%`;
+                }
+            } else {
+                const unitPrice = Math.round(selectedBasePrice * (1 + markup / 100) * 100) / 100;
+                if (priceInput) priceInput.value = unitPrice.toFixed(2);
+            }
+
+            const currentUnitPrice = parseFloat(priceInput?.value || 0);
+            const qty = parseInt(qtyInput?.value || 1, 10);
+            const total = Math.round(qty * currentUnitPrice * 100) / 100;
+            const diff = Math.round((currentUnitPrice - selectedBasePrice) * 100) / 100;
+            const sign = diff >= 0 ? '+' : '';
+
+            if (calcNote) {
+                calcNote.innerHTML = `Base value: <strong>${selectedBasePrice.toFixed(2)}</strong> ${sign}${diff.toFixed(2)} (${markup}% markup) &rarr; <strong>${currentUnitPrice.toFixed(2)}</strong>/unit &bull; Total: <strong>${total.toFixed(2)}</strong>`;
+            }
+
+            // Sync combo options styling
+            if (combo) {
+                const currentVal = (markupInput?.value || '').trim();
+                combo.querySelectorAll('.combo-option').forEach(opt => {
+                    const matches = opt.dataset.value === currentVal || opt.dataset.value === `${markup}%`;
+                    opt.classList.toggle('selected', matches);
+                });
+            }
+        }
+
+        // Initialize / Reset modal state
+        if (markupInput && !markupInput.value) markupInput.value = '5%';
+        if (calcNote) calcNote.innerHTML = '';
 
         if (select) {
             select.innerHTML = '<option value="" disabled selected>Loading products...</option>';
@@ -250,15 +310,71 @@ async function handleModalOpen(modalId, trigger) {
             select.onchange = () => {
                 const opt = select.options[select.selectedIndex];
                 if (opt && opt.dataset.price) {
-                    if (priceInput) priceInput.value = Number(opt.dataset.price).toFixed(2);
+                    selectedBasePrice = Number(opt.dataset.price) || 0;
                     if (catInput) catInput.value = opt.dataset.category || 'General';
                     if (qtyInput) {
                         qtyInput.max = opt.dataset.qty;
                         qtyInput.value = 1;
                     }
                     if (note) note.textContent = `Available stock: ${opt.dataset.qty}`;
+                    updateCalc('select');
+                } else {
+                    selectedBasePrice = 0;
+                    updateCalc('select');
                 }
             };
+        }
+
+        if (qtyInput) {
+            qtyInput.oninput = () => updateCalc('qty');
+        }
+
+        if (priceInput) {
+            priceInput.oninput = () => updateCalc('price');
+        }
+
+        if (markupInput) {
+            markupInput.oninput = () => updateCalc('markup');
+            markupInput.onblur = () => {
+                let v = markupInput.value.replace('%', '').trim();
+                if (!v || isNaN(parseFloat(v))) {
+                    markupInput.value = '5%';
+                } else if (!markupInput.value.endsWith('%')) {
+                    markupInput.value = `${v}%`;
+                }
+                updateCalc('markup');
+            };
+        }
+
+        // Setup combo dropdown toggle & option selection
+        if (combo && !combo.dataset.bound) {
+            const chevron = combo.querySelector('.combo-chevron');
+            const menu = combo.querySelector('.combo-menu');
+
+            if (chevron && menu) {
+                chevron.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    menu.hidden = !menu.hidden;
+                });
+
+                menu.querySelectorAll('.combo-option').forEach(opt => {
+                    opt.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        if (markupInput) {
+                            markupInput.value = opt.dataset.value;
+                            updateCalc('markup');
+                        }
+                        menu.hidden = true;
+                    });
+                });
+
+                document.addEventListener('click', (e) => {
+                    if (!combo.contains(e.target)) {
+                        menu.hidden = true;
+                    }
+                });
+            }
+            combo.dataset.bound = 'true';
         }
     } else if (modalId === 'edit-inventory-modal' && trigger?.dataset.id) {
         const id = trigger.dataset.id;
@@ -375,10 +491,14 @@ function setupFormHandlers() {
             const note = document.getElementById('create-sale-note');
             const submitBtn = form.querySelector('button[type="submit"]');
 
+            const markupRaw = form.elements['markup']?.value || '5%';
+            const markupVal = parseFloat(markupRaw.replace('%', '').trim());
+
             const payload = {
                 productId: form.elements['product']?.value,
                 quantity: form.elements['quantity']?.value,
-                price: form.elements['price']?.value
+                price: form.elements['price']?.value,
+                markup: isNaN(markupVal) ? 5 : markupVal
             };
 
             try {
@@ -761,39 +881,307 @@ async function loadInventory() {
     }
 }
 
-// 3. Sales Page Loader
+// 3. Sales Page Loader & Daily Sales Line Chart
+let salesChartInstance = null;
+let cachedSalesList = [];
+let selectedSalesMonth = '';
+let salesMonthFilterInitialized = false;
+
+function renderDailySalesChart(dailyData, monthLabel, totalRevenue) {
+    const canvas = document.getElementById('monthly-sales-chart');
+    if (!canvas || typeof Chart === 'undefined') return;
+
+    const isDark = document.documentElement.dataset.theme === 'dark';
+    const gridColor = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)';
+    const textColor = isDark ? '#ABB1BC' : '#626874';
+    const accentColor = '#DCFF00';
+
+    if (salesChartInstance) {
+        salesChartInstance.destroy();
+    }
+
+    const ctx = canvas.getContext('2d');
+    const gradient = ctx.createLinearGradient(0, 0, 0, 260);
+    if (isDark) {
+        gradient.addColorStop(0, 'rgba(220, 255, 0, 0.28)');
+        gradient.addColorStop(0.65, 'rgba(220, 255, 0, 0.05)');
+        gradient.addColorStop(1, 'rgba(220, 255, 0, 0.0)');
+    } else {
+        gradient.addColorStop(0, 'rgba(220, 255, 0, 0.35)');
+        gradient.addColorStop(0.65, 'rgba(220, 255, 0, 0.08)');
+        gradient.addColorStop(1, 'rgba(220, 255, 0, 0.0)');
+    }
+
+    salesChartInstance = new Chart(canvas, {
+        type: 'line',
+        data: {
+            labels: dailyData.map(d => d.day),
+            datasets: [
+                {
+                    label: 'Daily Revenue',
+                    data: dailyData.map(d => d.revenue),
+                    borderColor: accentColor,
+                    backgroundColor: gradient,
+                    borderWidth: 2.5,
+                    fill: true,
+                    tension: 0.35,
+                    pointBackgroundColor: accentColor,
+                    pointBorderColor: isDark ? '#191B1E' : '#FFFFFF',
+                    pointBorderWidth: 1.5,
+                    pointRadius: (context) => {
+                        const val = context.raw || 0;
+                        return val > 0 ? 5 : 2;
+                    },
+                    pointHoverRadius: 7,
+                    pointHoverBackgroundColor: '#FFFFFF',
+                    pointHoverBorderColor: accentColor,
+                    pointHoverBorderWidth: 2.5
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                mode: 'index',
+                intersect: false
+            },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: isDark ? '#191B1E' : '#FFFFFF',
+                    titleColor: isDark ? '#F4F5F7' : '#171A21',
+                    bodyColor: isDark ? '#C0C5CE' : '#505661',
+                    borderColor: isDark ? '#DCFF00' : 'rgba(0, 0, 0, 0.15)',
+                    borderWidth: 1,
+                    padding: 12,
+                    boxPadding: 4,
+                    callbacks: {
+                        title: function(items) {
+                            if (!items.length) return '';
+                            const idx = items[0].dataIndex;
+                            return dailyData[idx]?.fullDateLabel || `Day ${dailyData[idx]?.day}`;
+                        },
+                        label: function(context) {
+                            const idx = context.dataIndex;
+                            const day = dailyData[idx];
+                            const rev = context.parsed.y;
+                            const units = day ? day.units : 0;
+                            const orders = day ? day.orders : 0;
+                            return [
+                                ` Revenue: $${rev.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+                                ` Units Sold: ${units}`,
+                                ` Orders: ${orders}`
+                            ];
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        color: gridColor,
+                        drawBorder: false
+                    },
+                    ticks: {
+                        color: textColor,
+                        font: { family: "'Geist', sans-serif", size: 11 },
+                        maxTicksLimit: 16
+                    }
+                },
+                y: {
+                    min: 0,
+                    grid: {
+                        color: gridColor,
+                        drawBorder: false
+                    },
+                    ticks: {
+                        color: textColor,
+                        font: { family: "'Geist', sans-serif", size: 11 },
+                        callback: function(val) {
+                            if (val >= 1000) return '$' + (val / 1000).toFixed(val % 1000 === 0 ? 0 : 1) + 'k';
+                            return '$' + val;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function updateSalesChartForSelectedMonth() {
+    if (!selectedSalesMonth) return;
+
+    const [yearStr, monthStr] = selectedSalesMonth.split('-');
+    const year = parseInt(yearStr, 10);
+    const monthIndex = parseInt(monthStr, 10) - 1;
+    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    const monthNamesShort = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const monthName = monthNames[monthIndex] || 'Selected Month';
+    const shortMonth = monthNamesShort[monthIndex] || '';
+
+    const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+    const dailyData = [];
+
+    for (let d = 1; d <= daysInMonth; d++) {
+        dailyData.push({
+            day: d,
+            fullDateLabel: `${shortMonth} ${d}, ${year}`,
+            revenue: 0,
+            units: 0,
+            orders: 0
+        });
+    }
+
+    let monthRevenue = 0;
+    cachedSalesList.forEach(sale => {
+        const saleDate = new Date(sale.createdAt || Date.now());
+        const key = `${saleDate.getFullYear()}-${String(saleDate.getMonth() + 1).padStart(2, '0')}`;
+        if (key === selectedSalesMonth) {
+            const dayNum = saleDate.getDate();
+            if (dayNum >= 1 && dayNum <= daysInMonth) {
+                const rev = Number(sale.total || (sale.price * sale.quantity) || 0);
+                const qty = Number(sale.quantity || 1);
+                dailyData[dayNum - 1].revenue += rev;
+                dailyData[dayNum - 1].units += qty;
+                dailyData[dayNum - 1].orders += 1;
+                monthRevenue += rev;
+            }
+        }
+    });
+
+    const subtitleEl = document.getElementById('sales-chart-subtitle');
+    if (subtitleEl) {
+        subtitleEl.textContent = `Daily sales trajectory for ${monthName} ${year}`;
+    }
+
+    const badgeEl = document.getElementById('chart-month-total') || document.getElementById('chart-annual-total');
+    if (badgeEl) {
+        badgeEl.textContent = `Month Total: $${monthRevenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    }
+
+    renderDailySalesChart(dailyData, `${monthName} ${year}`, monthRevenue);
+}
+
 async function loadSales() {
     const tbody = document.querySelector('.sales-table tbody');
-    if (!tbody) return;
+    const chartCanvas = document.getElementById('monthly-sales-chart');
+    if (!tbody && !chartCanvas) return;
 
     try {
         const res = await fetch('/api/sales');
         if (!res.ok) throw new Error('Failed to fetch sales');
         const sales = await res.json();
-        tbody.innerHTML = '';
+        cachedSalesList = sales;
 
-        if (sales.length === 0) {
-            tbody.innerHTML = `
-                <tr>
-                    <td class="table-empty" colspan="5" style="text-align: center; padding: 2rem;">
-                        No sales recorded yet. Create a sale from the Overview page.
-                    </td>
-                </tr>
-            `;
-            return;
+        // 1. Calculate Overall KPIs
+        const now = new Date();
+        const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+        let totalRevenue = 0;
+        let totalUnits = 0;
+        let thisMonthRevenue = 0;
+
+        sales.forEach(sale => {
+            const rev = Number(sale.total || (sale.price * sale.quantity) || 0);
+            const qty = Number(sale.quantity || 1);
+            totalRevenue += rev;
+            totalUnits += qty;
+
+            const saleDate = new Date(sale.createdAt || Date.now());
+            const saleKey = `${saleDate.getFullYear()}-${String(saleDate.getMonth() + 1).padStart(2, '0')}`;
+            if (saleKey === currentMonthKey) {
+                thisMonthRevenue += rev;
+            }
+        });
+
+        // 2. Update KPI Cards
+        const totalRevEl = document.getElementById('sales-total-revenue');
+        const thisMonthEl = document.getElementById('sales-this-month');
+        const itemsSoldEl = document.getElementById('sales-items-sold');
+        const avgOrderEl = document.getElementById('sales-avg-order');
+        const totalOrdersEl = document.getElementById('sales-total-orders');
+
+        if (totalRevEl) totalRevEl.textContent = `$${totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        if (thisMonthEl) thisMonthEl.textContent = `$${thisMonthRevenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} this month`;
+        if (itemsSoldEl) itemsSoldEl.textContent = totalUnits.toLocaleString();
+        if (avgOrderEl) {
+            const avg = sales.length > 0 ? totalRevenue / sales.length : 0;
+            avgOrderEl.textContent = `$${avg.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        }
+        if (totalOrdersEl) totalOrdersEl.textContent = `${sales.length} transaction${sales.length === 1 ? '' : 's'}`;
+
+        // 3. Month Dropdown Setup & Daily Sales Line Chart
+        const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+        const availableMonths = new Map();
+
+        // Past 12 months in descending order (most recent first)
+        for (let i = 0; i < 12; i++) {
+            const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+            const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+            const label = `${monthNames[d.getMonth()]} ${d.getFullYear()}`;
+            availableMonths.set(key, label);
         }
 
-        sales.forEach((sale) => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${escapeHtml(sale.productName || sale.product?.name || 'Product')}</td>
-                <td>${sale.quantity}</td>
-                <td>${escapeHtml(sale.categoryName || 'General')}</td>
-                <td>$${Number(sale.price || 0).toFixed(2)}</td>
-                <td>$${Number(sale.total || 0).toFixed(2)}</td>
-            `;
-            tbody.appendChild(tr);
+        // Include any sales outside standard 12 months
+        sales.forEach(sale => {
+            const d = new Date(sale.createdAt || Date.now());
+            const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+            if (!availableMonths.has(key)) {
+                availableMonths.set(key, `${monthNames[d.getMonth()]} ${d.getFullYear()}`);
+            }
         });
+
+        const monthSelect = document.getElementById('sales-month-select');
+        if (monthSelect) {
+            const currentSelected = selectedSalesMonth || monthSelect.value;
+            selectedSalesMonth = availableMonths.has(currentSelected)
+                ? currentSelected
+                : (availableMonths.has(currentMonthKey) ? currentMonthKey : Array.from(availableMonths.keys())[0]);
+
+            monthSelect.innerHTML = Array.from(availableMonths.entries()).map(([k, label]) => {
+                return `<option value="${k}" ${k === selectedSalesMonth ? 'selected' : ''}>${label}</option>`;
+            }).join('');
+
+            if (!salesMonthFilterInitialized) {
+                monthSelect.addEventListener('change', () => {
+                    selectedSalesMonth = monthSelect.value;
+                    updateSalesChartForSelectedMonth();
+                });
+                salesMonthFilterInitialized = true;
+            }
+        } else if (!selectedSalesMonth) {
+            selectedSalesMonth = currentMonthKey;
+        }
+
+        updateSalesChartForSelectedMonth();
+
+        // 4. Populate Sales Table
+        if (tbody) {
+            tbody.innerHTML = '';
+
+            if (sales.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td class="table-empty" colspan="5" style="text-align: center; padding: 2rem;">
+                            No sales recorded yet. Create a sale from the Overview page.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            sales.forEach((sale) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${escapeHtml(sale.productName || sale.product?.name || 'Product')}</td>
+                    <td>${sale.quantity}</td>
+                    <td>${escapeHtml(sale.categoryName || 'General')}</td>
+                    <td>$${Number(sale.price || 0).toFixed(2)}</td>
+                    <td>$${Number(sale.total || 0).toFixed(2)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
     } catch (err) {
         console.error('Error loading sales:', err);
     }

@@ -75,6 +75,13 @@ const saleSchema = new mongoose.Schema({
         required: [true, 'Quantity sold is required'], 
         min: [1, 'Must sell at least 1 item'] 
     },
+    basePrice: {
+        type: Number
+    },
+    markup: {
+        type: Number,
+        default: 5
+    },
     price: { 
         type: Number, 
         required: true, 
@@ -306,7 +313,7 @@ app.get('/api/sales', async (req, res) => {
 
 app.post('/api/sales', async (req, res) => {
     try {
-        const { productId, quantity, price } = req.body;
+        const { productId, quantity, price, markup } = req.body;
         const qty = Number(quantity);
         if (!productId || !qty || qty <= 0) {
             return res.status(400).json({ error: 'Valid product and quantity are required' });
@@ -323,8 +330,11 @@ app.post('/api/sales', async (req, res) => {
             });
         }
 
-        const unitPrice = price !== undefined ? Number(price) : product.price;
-        const total = qty * unitPrice;
+        const markupPct = (markup !== undefined && !isNaN(Number(markup))) ? Number(markup) : 5;
+        const unitPrice = (price !== undefined && !isNaN(Number(price))) 
+            ? Number(price) 
+            : Math.round(product.price * (1 + markupPct / 100) * 100) / 100;
+        const total = Math.round(qty * unitPrice * 100) / 100;
         const categoryName = product.category?.name || 'General';
 
         // Decrement product inventory
@@ -337,6 +347,8 @@ app.post('/api/sales', async (req, res) => {
             productName: product.name,
             categoryName: categoryName,
             quantity: qty,
+            basePrice: product.price,
+            markup: markupPct,
             price: unitPrice,
             total: total
         });

@@ -208,11 +208,51 @@
             </div>
             <p class="modal-note product-note" id="sale-product-note">Products will appear when inventory is connected.</p>
             <div class="modal-field-row">
-                <div><label for="sale-quantity">Quantity</label><input id="sale-quantity" name="quantity" type="number" min="1" step="1" value="1" required></div>
-                <div><label for="sale-price">Unit price</label><input id="sale-price" name="price" type="number" min="0" step="0.01" placeholder="0.00" required></div>
+                <div>
+                    <label for="sale-quantity">Quantity</label>
+                    <input id="sale-quantity" name="quantity" type="number" min="1" step="1" value="1" required>
+                </div>
+                <div>
+                    <label for="sale-markup">Markup (%)</label>
+                    <div class="modal-combo" id="sale-markup-combo">
+                        <input id="sale-markup" name="markup" type="text" list="markup-presets" value="5%" placeholder="5%" autocomplete="off" aria-label="Markup percentage">
+                        <button type="button" class="combo-chevron" tabindex="-1" aria-label="Open markup options">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
+                        </button>
+                        <div class="combo-menu" hidden>
+                            <button type="button" class="combo-option" data-value="0%">0% (No markup)</button>
+                            <button type="button" class="combo-option selected" data-value="5%">5% (Default)</button>
+                            <button type="button" class="combo-option" data-value="10%">10%</button>
+                            <button type="button" class="combo-option" data-value="15%">15%</button>
+                            <button type="button" class="combo-option" data-value="20%">20%</button>
+                            <button type="button" class="combo-option" data-value="25%">25%</button>
+                            <button type="button" class="combo-option" data-value="30%">30%</button>
+                            <button type="button" class="combo-option" data-value="50%">50%</button>
+                        </div>
+                        <datalist id="markup-presets">
+                            <option value="0%">
+                            <option value="5%">
+                            <option value="10%">
+                            <option value="15%">
+                            <option value="20%">
+                            <option value="25%">
+                            <option value="30%">
+                            <option value="50%">
+                        </datalist>
+                    </div>
+                </div>
             </div>
-            <label for="sale-category">Category</label>
-            <input id="sale-category" name="category" type="text" placeholder="Enter category">
+            <div class="modal-field-row">
+                <div>
+                    <label for="sale-price">Unit price</label>
+                    <input id="sale-price" name="price" type="number" min="0" step="0.01" placeholder="0.00" required>
+                </div>
+                <div>
+                    <label for="sale-category">Category</label>
+                    <input id="sale-category" name="category" type="text" placeholder="Enter category" readonly>
+                </div>
+            </div>
+            <p class="modal-note sale-calc-breakdown" id="sale-calc-note"></p>
             <p class="modal-note" id="create-sale-note"></p>
             <div class="modal-actions">
                 <button type="button" data-modal-close>Cancel</button>
