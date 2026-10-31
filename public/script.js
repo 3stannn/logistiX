@@ -140,3 +140,50 @@ sidebarNavigation.addEventListener('keydown', (event) => {
 });
 
 setMenuExpanded(!mobileLayout.matches);
+
+document.querySelectorAll('dialog.action-modal').forEach((modal) => {
+    let trigger;
+    modal.addEventListener('dashboard:open', (event) => {
+        trigger = event.detail.trigger;
+    });
+
+    modal.querySelectorAll('[data-modal-close]').forEach((button) => {
+        button.addEventListener('click', () => modal.close());
+    });
+
+    // Only dismiss when both ends of a click land on the backdrop.
+    let backdropPressed = false;
+    const isOutside = (event) => {
+        const bounds = modal.getBoundingClientRect();
+        return event.clientX < bounds.left || event.clientX > bounds.right ||
+            event.clientY < bounds.top || event.clientY > bounds.bottom;
+    };
+    modal.addEventListener('pointerdown', (event) => {
+        backdropPressed = event.target === modal && isOutside(event);
+    });
+    modal.addEventListener('click', (event) => {
+        if (backdropPressed && event.target === modal && isOutside(event)) modal.close();
+        backdropPressed = false;
+    });
+
+    modal.addEventListener('close', () => {
+        document.documentElement.classList.remove('modal-open');
+        if (trigger?.isConnected) trigger.focus();
+        else document.querySelector('[data-modal-target]')?.focus();
+    });
+
+    // Keep the form local until a persistence endpoint is available.
+    modal.querySelector('form').addEventListener('submit', (event) => event.preventDefault());
+});
+
+// Open the dialog associated with each UI action.
+document.addEventListener('click', (event) => {
+    const trigger = event.target.closest('[data-modal-target]');
+    if (!trigger) return;
+    const modal = document.getElementById(trigger.dataset.modalTarget);
+    if (!modal) return;
+    navPopovers.forEach((entry) => closePopover(entry));
+    modal.dispatchEvent(new CustomEvent('dashboard:open', { detail: { trigger } }));
+    modal.showModal();
+    document.documentElement.classList.add('modal-open');
+});

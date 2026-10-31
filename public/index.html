@@ -90,8 +90,11 @@
         </div>
     </nav>
     <main>
-        <div class="page-heading">
+        <div class="page-heading dashboard-heading">
             <h1 class="heading">Overview</h1>
+            <div class="dashboard-actions">
+                <button type="button" data-modal-target="create-sale-modal" aria-haspopup="dialog" aria-controls="create-sale-modal">Create sale</button>
+                <button type="button" data-modal-target="add-item-modal" aria-haspopup="dialog" aria-controls="add-item-modal">Add item</button>
             <button class="refresh-button" type="button" aria-label="Refresh dashboard" onclick="refreshDashboard()">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
                     stroke="#737373" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -103,6 +106,7 @@
                 </svg>
                 <span>refresh</span>
             </button>
+            </div>
         </div>
         <div class="card-container">
             <div class="card">
@@ -186,6 +190,68 @@
             </div>
         </div>
     </main>
+    <dialog class="action-modal" id="create-sale-modal" aria-labelledby="create-sale-title" aria-describedby="create-sale-note">
+        <div class="popover-header">
+            <h2 id="create-sale-title">Create sale</h2>
+            <button class="popover-close" type="button" data-modal-close aria-label="Close create sale">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg>
+            </button>
+        </div>
+        <form class="modal-form">
+            <label for="sale-product">Product name</label>
+            <div class="modal-select">
+                <select id="sale-product" name="product" required autofocus aria-describedby="sale-product-note">
+                    <option value="" disabled selected>Select a product</option>
+                    <option value="" disabled>No products available</option>
+                </select>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
+            </div>
+            <p class="modal-note product-note" id="sale-product-note">Products will appear when inventory is connected.</p>
+            <div class="modal-field-row">
+                <div><label for="sale-quantity">Quantity</label><input id="sale-quantity" name="quantity" type="number" min="1" step="1" value="1" required></div>
+                <div><label for="sale-price">Unit price</label><input id="sale-price" name="price" type="number" min="0" step="0.01" placeholder="0.00" required></div>
+            </div>
+            <label for="sale-category">Category</label>
+            <input id="sale-category" name="category" type="text" placeholder="Enter category">
+            <p class="modal-note" id="create-sale-note">Saving sales is not connected yet.</p>
+            <div class="modal-actions">
+                <button type="button" data-modal-close>Cancel</button>
+                <button type="submit" disabled aria-describedby="create-sale-note">Create sale</button>
+            </div>
+        </form>
+    </dialog>
+    <dialog class="action-modal" id="add-item-modal" aria-labelledby="add-item-title" aria-describedby="add-item-note">
+        <div class="popover-header">
+            <h2 id="add-item-title">Add item</h2>
+            <button class="popover-close" type="button" data-modal-close aria-label="Close add item">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg>
+            </button>
+        </div>
+        <form class="modal-form">
+            <label for="item-name">Product name</label>
+            <input id="item-name" name="name" type="text" placeholder="Enter product name" required autofocus>
+            <label for="item-description">Description</label>
+            <textarea id="item-description" name="description" rows="3" placeholder="Enter item description"></textarea>
+            <div class="modal-field-row">
+                <div><label for="item-quantity">Quantity</label><input id="item-quantity" name="quantity" type="number" min="0" step="1" value="0" required></div>
+                <div><label for="item-price">Unit price</label><input id="item-price" name="price" type="number" min="0" step="0.01" placeholder="0.00" required></div>
+            </div>
+            <label for="item-category">Category</label>
+            <div class="modal-select">
+                <select id="item-category" name="category" required aria-describedby="item-category-note">
+                    <option value="" disabled selected>Select a category</option>
+                    <option value="" disabled>No categories available</option>
+                </select>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
+            </div>
+            <p class="modal-note product-note" id="item-category-note">Categories will appear when category data is connected.</p>
+            <p class="modal-note" id="add-item-note">Saving inventory items is not connected yet.</p>
+            <div class="modal-actions">
+                <button type="button" data-modal-close>Cancel</button>
+                <button type="submit" disabled aria-describedby="add-item-note">Add item</button>
+            </div>
+        </form>
+    </dialog>
     <script src="./script.js"></script>
     <script type="module" src="https://cdn.jsdelivr.net/npm/bootstrap@6.0.0-alpha.1/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-1a/pXj49ZQ1aHEmrJ+gMw1otqoVsYwlEnlD8mIfY2TV03r20Y0CN7uqx1tQogjPL"

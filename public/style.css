@@ -443,6 +443,167 @@ main {
     font-size: 12px;
 }
 
+.dashboard-actions,
+.modal-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+html.modal-open {
+    overflow: hidden;
+}
+
+.action-modal {
+    width: min(460px, calc(100vw - 32px));
+    max-height: calc(100dvh - 32px);
+    margin: auto;
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    background: var(--surface);
+    color: var(--ink);
+    box-shadow: var(--popover-shadow);
+    overflow-y: auto;
+}
+
+.action-modal::backdrop {
+    background: rgba(0, 0, 0, 0.45);
+}
+
+.modal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 20px;
+}
+
+.modal-form label {
+    display: block;
+    margin: 0;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.modal-form :is(input, textarea, select) {
+    width: 100%;
+    min-height: 38px;
+    padding: 8px 10px;
+    border: 1px solid var(--control-border);
+    border-radius: 6px;
+    background: var(--surface);
+    color: var(--ink);
+    font: inherit;
+}
+
+.modal-form textarea {
+    resize: vertical;
+}
+
+.modal-form :is(input, textarea)::placeholder {
+    color: var(--muted);
+    opacity: 1;
+}
+
+.modal-form :is(input, textarea, select):focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+}
+
+.modal-select {
+    position: relative;
+}
+
+.modal-select select {
+    appearance: none;
+    padding-right: 38px;
+    cursor: pointer;
+    transition: border-color 150ms ease, background-color 150ms ease;
+}
+
+.modal-select select:hover {
+    border-color: var(--control-hover-border);
+    background: var(--sidebar);
+}
+
+.modal-select select:invalid {
+    color: var(--muted);
+}
+
+.modal-select option {
+    background: var(--surface);
+    color: var(--ink);
+}
+
+.modal-select option:disabled {
+    color: var(--muted);
+}
+
+.modal-select svg {
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    color: var(--muted);
+    pointer-events: none;
+    transform: translateY(-50%);
+}
+
+.modal-form .product-note {
+    margin-top: 0;
+}
+
+.modal-field-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-block: 8px;
+}
+
+.modal-field-row label {
+    margin-bottom: 8px;
+}
+
+.modal-note {
+    margin-top: 8px;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.modal-actions {
+    justify-content: flex-end;
+    margin-top: 12px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+}
+
+.modal-actions button:disabled {
+    color: var(--muted);
+    background: var(--hover);
+    cursor: not-allowed;
+}
+
+@media (max-width: 640px) {
+    .dashboard-heading {
+        flex-wrap: wrap;
+    }
+
+    .dashboard-actions {
+        width: 100%;
+    }
+
+    .dashboard-actions button,
+    .create-category-button,
+    .modal-actions button,
+    .modal-form :is(input, textarea, select) {
+        min-height: 44px;
+    }
+
+    .modal-form :is(input, textarea, select) {
+        font-size: 16px;
+    }
+}
+
 .refresh-button svg {
     width: 14px;
     height: 14px;
@@ -670,6 +831,14 @@ main {
 
 .categories-table th:first-child {
     width: 32%;
+}
+
+.categories-table {
+    min-width: 640px;
+}
+
+.categories-table th:last-child {
+    width: 192px;
 }
 
 .data-table .table-empty {
